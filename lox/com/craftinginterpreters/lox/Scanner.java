@@ -101,6 +101,13 @@ class Scanner {
           // A comment goes until the end of the line.
           while (peek() != '\n' && !isAtEnd())
             advance();
+        } else if(match('*')) {
+          while (peek() != '*' && !isAtEnd())
+            advance();
+          if (peek() == '*' && peekNext() == '/') {
+            advance();
+            advance();
+          }
         } else {
           addToken(SLASH);
         }
@@ -225,6 +232,7 @@ class Scanner {
 
   private void addToken(TokenType type, Object literal) {
     String text = source.substring(start, current);
+    System.out.println(text);
     tokens.add(new Token(type, text, literal, line));
   }
 
