@@ -17,14 +17,47 @@ class Parser {
 
     Expr parse() {
         try {
-          return expression();
+          return comma_series();
         } catch (ParseError error) {
           return null;
         }
       }
 
+    private Expr comma_series() {
+        Expr expr = expression();
+
+        while (match(COMMA)) {
+            Token operator = previous();
+            Expr right = expression();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
     private Expr expression() {
-        return equality();
+        return ternary();
+    }
+
+    private Expr ternary() {
+        Expr expr = equality();
+
+        while (match(QM)) {
+            Token operator = previous();
+            Expr right = ternary_right();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+        return expr;
+    }
+
+    private Expr ternary_right() {
+        Expr expr = equality();
+
+        while (match(COLON)) {
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+        return expr;
     }
 
     private Expr equality() {

@@ -81,8 +81,14 @@ class Scanner {
       case ';':
         addToken(SEMICOLON);
         break;
+      case ':':
+        addToken(COLON);
+        break;
       case '*':
         addToken(STAR);
+        break;
+      case '?':
+        addToken(QM);
         break;
       case '!':
         addToken(match('=') ? BANG_EQUAL : BANG);
