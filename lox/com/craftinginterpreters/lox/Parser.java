@@ -73,6 +73,9 @@ class Parser {
 
     private Expr comparison() {
         Expr expr = term();
+        if (expr == null) {
+            throw error(peek(), "unexpected expression.");
+        }
 
         while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
             Token operator = previous();
@@ -87,6 +90,9 @@ class Parser {
         Expr expr = factor();
 
         while (match(MINUS, PLUS)) {
+            if (expr == null) {
+                throw error(peek(), "Missing left hand operand.");
+            }
             Token operator = previous();
             Expr right = factor();
             expr = new Expr.Binary(expr, operator, right);
@@ -99,6 +105,9 @@ class Parser {
         Expr expr = unary();
 
         while (match(SLASH, STAR)) {
+            if (expr == null) {
+                throw error(peek(), "Missing left hand operand.");
+            }
             Token operator = previous();
             Expr right = unary();
             expr = new Expr.Binary(expr, operator, right);
@@ -134,7 +143,7 @@ class Parser {
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
-        throw error(peek(), "Expect expression.");
+        return null;
     }
 
     private boolean match(TokenType... types) {
