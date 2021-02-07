@@ -232,7 +232,6 @@ class Scanner {
 
   private void addToken(TokenType type, Object literal) {
     String text = source.substring(start, current);
-    System.out.println(text);
     tokens.add(new Token(type, text, literal, line));
   }
 
