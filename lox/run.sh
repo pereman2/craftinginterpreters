@@ -1,2 +1,2 @@
-javac com/craftinginterpreters/lox/*.java
-java com.craftinginterpreters.lox.Lox $1
+javac com/craftinginterpreters/lox/*.java -d ./classes
+java -cp classes com.craftinginterpreters.lox.Lox $1
