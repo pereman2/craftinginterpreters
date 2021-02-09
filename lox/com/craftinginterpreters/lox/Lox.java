@@ -8,10 +8,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.craftinginterpreters.lox.Stmt.Expression;
+
 public class Lox {
     private static final Interpreter interpreter = new Interpreter();
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
+    static boolean prompt = false;
 
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
@@ -37,6 +40,7 @@ public class Lox {
     private static void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
+        prompt = true;
         for (;;) {
             System.out.print("> ");
             String line = reader.readLine();
@@ -52,14 +56,23 @@ public class Lox {
         List<Token> tokens = scanner.scanTokens();
 
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
         // Stop if there was a syntax error.
         if (hadError)
             return;
 
-        System.out.println(new AstPrinter().print(expression));
-        interpreter.interpret(expression);
+        if (prompt) {
+            Stmt statement = statements.get(0);
+            if (statement instanceof Expression) {
+                System.out.println(interpreter.interpret((Expression) statement));
+            } else {
+                interpreter.interpret(statements);
+
+            }
+        } else {
+            interpreter.interpret(statements);
+        }
 
     }
 
