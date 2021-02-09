@@ -6,17 +6,31 @@ import java.util.Map;
 class Environment {
     private final Map<String, Object> values = new HashMap<>();
     final Environment enclosing;
+    private boolean exit = false;
+    private boolean loop = false;
 
     Environment() {
         enclosing = null;
     }
 
-    Environment(Environment enclosing) {
+    Environment(Environment enclosing, boolean loop) {
         this.enclosing = enclosing;
+        this.loop = loop;
     }
 
     void define(String name, Object value) {
         values.put(name, value);
+    }
+
+    boolean isLoopEnvironment () {
+        return this.loop;
+    }
+    void signalBreak() {
+        this.exit = true;
+    }
+
+    boolean breakSignaled() {
+        return this.exit;
     }
 
     Object get(Token name) {

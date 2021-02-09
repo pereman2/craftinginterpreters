@@ -15,9 +15,11 @@ statement      → exprStmt
                 | ifStmt
                 | forStmt
                 | whileStmt
+                | breakStmt
                 | printStmt
                 | block
                 
+breakStmt      → "break" ";";
 forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
                 expression? ";"
                 expression? ")" statement ;

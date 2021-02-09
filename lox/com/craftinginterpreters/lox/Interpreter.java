@@ -2,12 +2,13 @@ package com.craftinginterpreters.lox;
 
 import java.util.List;
 
+import com.craftinginterpreters.lox.Stmt.Break;
 import com.craftinginterpreters.lox.Stmt.Expression;
-
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private Environment environment = new Environment();
+    private boolean loop = false;
 
     Object interpret(Expression expression) {
         try {
@@ -17,6 +18,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
         return null;
     }
+
     void interpret(List<Stmt> statements) {
         try {
             for (Stmt statement : statements) {
@@ -66,7 +68,17 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             this.environment = environment;
 
             for (Stmt statement : statements) {
+                if(statement instanceof Stmt.Break) {
+                    previous.signalBreak();
+                    break;
+                }
                 execute(statement);
+                if(this.environment.breakSignaled()) {
+                    if(!this.environment.isLoopEnvironment()) {
+                        previous.signalBreak();
+                    }
+                    break;
+                }
             }
         } finally {
             this.environment = previous;
@@ -75,7 +87,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitBlockStmt(Stmt.Block stmt) {
-        executeBlock(stmt.statements, new Environment(environment));
+        boolean loopBlock = this.loop;
+        this.loop = false;
+        executeBlock(stmt.statements, new Environment(environment, loopBlock));
         return null;
     }
 
@@ -115,7 +129,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitWhileStmt(Stmt.While stmt) {
-        while (isTruthy(evaluate(stmt.condition))) {
+        this.loop = true;
+        while (isTruthy(evaluate(stmt.condition)) && !this.environment.breakSignaled()) {
             execute(stmt.body);
         }
         return null;
@@ -243,6 +258,12 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             return;
 
         throw new RuntimeError(operator, "Operands must be numbers.");
+    }
+
+    @Override
+    public Void visitBreakStmt(Break stmt) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

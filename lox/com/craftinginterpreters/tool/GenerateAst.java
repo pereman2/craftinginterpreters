@@ -20,7 +20,7 @@ public class GenerateAst {
 
         defineAst(outputDir, "Stmt", Arrays.asList("Block      : List<Stmt> statements", "Expression : Expr expression",
                 "If         : Expr condition, Stmt thenBranch," + " Stmt elseBranch", "Print      : Expr expression",
-                "Var        : Token name, Expr initializer", "While      : Expr condition, Stmt body"));
+                "Var        : Token name, Expr initializer", "While      : Expr condition, Stmt body", "Break      : "));
 
     }
 
@@ -67,10 +67,13 @@ public class GenerateAst {
         writer.println("    " + className + "(" + fieldList + ") {");
 
         // Store parameters in fields.
-        String[] fields = fieldList.split(", ");
-        for (String field : fields) {
-            String name = field.split(" ")[1];
-            writer.println("      this." + name + " = " + name + ";");
+        String[] fields = {};
+        if(fieldList.trim().length() > 0) {
+            fields = fieldList.split(", ");
+            for (String field : fields) {
+                String name = field.split(" ")[1];
+                writer.println("      this." + name + " = " + name + ";");
+            }
         }
 
         writer.println("    }");
