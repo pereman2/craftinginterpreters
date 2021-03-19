@@ -9,11 +9,13 @@ This repo is just me following craftinginterpreter's book and reproducing it.
 ```
 program        → declaration* EOF;
 
-declaration    → varDecl
+declaration    → funDecl
+                | varDecl
                 | statement
 statement      → exprStmt
                 | ifStmt
                 | forStmt
+                | returnStmt
                 | whileStmt
                 | breakStmt
                 | printStmt
@@ -23,12 +25,18 @@ breakStmt      → "break" ";";
 forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
                 expression? ";"
                 expression? ")" statement ;
+
+returnStmt     → "return" expression? ";" ;
 whileStmt      → "while" "(" expression ")" statement ;
 ifStmt         → "if" "(" expression  ")" statement ("else" statement )? ;
 
 block          → "{" declaration* "}" ;
                 
+funDecl        → "fun" function ;
+function       → IDENTIFIER "(" parameters? ")" block ;
 varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
+
                 
 exprtStmt      → expression ";";
 printStmt      → "print" expression ";";
@@ -48,8 +56,9 @@ equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           → factor ( ( "-" | "+" ) factor )* ;
 factor         → unary ( ( "/" | "*" ) unary )* ;
-unary          → ( "!" | "-" ) unary
-                | primary ;
+unary          → ( "!" | "-" ) unary | call ;
+call           → primary ( "(" arguments? ")" )* ;
+arguments      → expression ( "," expression )* ;
 primary        → "true" | "false" | "nil"
                 | NUMBER | STRING
                 | "(" expression ")"
