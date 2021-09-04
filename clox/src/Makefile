@@ -1,21 +1,25 @@
 IDIR =../include
 CC=gcc
-CFLAGS=-I$(IDIR)
+CFLAGS=-I$(IDIR) -g
+SAVETEMPS=-save-temps
+SAVETEMPS=
 
 ODIR=obj
 LDIR =../lib
 
 LIBS=-lm
 
-_DEPS = memory.h chunk.h common.h debug.h value.h
-DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+_SOURCE = $(wildcard *.c)
+OBJ = $(patsubst %.c, $(ODIR)/%.o, $(_SOURCE))
+ASM = $(patsubst %.c, $(ODIR)/%.s, $(_SOURCE))
+DEPS = $(patsubst %.h,$(IDIR)/%,$(_DEPS))
 
-_OBJ = memory.o chunk.o main.o debug.o value.o
-OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
+$(ODIR)/%.o: %.c
+	$(CC) $(SAVETEMPS) -o $@ $< $(CFLAGS) -c
 
-$(ODIR)/%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+# $(ODIR)/%.o: $(ASM)
+# 	$(CC) -o $@ $< $(CFLAGS)
 
 main: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
@@ -24,3 +28,6 @@ main: $(OBJ)
 
 clean:
 	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~
+	rm -f *.s *~ core $(INCDIR)/*~
+	rm -f *.bc *~ core $(INCDIR)/*~
+	rm -f *.i *~ core $(INCDIR)/*~
