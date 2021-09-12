@@ -2,7 +2,7 @@ IDIR =../include
 CC=gcc
 CFLAGS=-I$(IDIR) -g
 SAVETEMPS=-save-temps
-SAVETEMPS=
+# SAVETEMPS=
 
 ODIR=obj
 LDIR =../lib
@@ -17,9 +17,6 @@ DEPS = $(patsubst %.h,$(IDIR)/%,$(_DEPS))
 
 $(ODIR)/%.o: %.c
 	$(CC) $(SAVETEMPS) -o $@ $< $(CFLAGS) -c
-
-# $(ODIR)/%.o: $(ASM)
-# 	$(CC) -o $@ $< $(CFLAGS)
 
 main: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)

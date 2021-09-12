@@ -74,10 +74,10 @@ static InterpretResult run() {
       }
 
       case OP_NEGATE: {
-        Value negated = -pop();
+        *(vm.stackTop-1) = -(*(vm.stackTop - 1));
+        Value negated = *(vm.stackTop-1);
         printValue(negated);
         printf("\n");
-        push(negated);
         break;
       }
       case OP_ADD:
